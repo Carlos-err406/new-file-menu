@@ -7,7 +7,7 @@
 #   curl -fsSL https://raw.githubusercontent.com/Carlos-err406/new-file-menu/main/quick-action/install.sh | bash
 set -euo pipefail
 
-RAW_BASE="https://raw.githubusercontent.com/Carlos-err406/new-file-menu/main/quick-action/New%20File.workflow/Contents"
+TARBALL="https://github.com/Carlos-err406/new-file-menu/archive/refs/heads/main.tar.gz"
 DEST="$HOME/Library/Services/New File.workflow"
 
 # Find a local copy if we're running from a checkout (not via curl | bash).
@@ -24,9 +24,10 @@ if [ -n "$SRC_DIR" ] && [ -d "$SRC_DIR/New File.workflow" ]; then
 	cp -R "$SRC_DIR/New File.workflow" "$DEST"
 else
 	echo "  (downloading from GitHub)"
-	mkdir -p "$DEST/Contents"
-	curl -fsSL "$RAW_BASE/Info.plist"     -o "$DEST/Contents/Info.plist"
-	curl -fsSL "$RAW_BASE/document.wflow" -o "$DEST/Contents/document.wflow"
+	tmp="$(mktemp -d)"
+	trap 'rm -rf "$tmp"' EXIT
+	curl -fsSL "$TARBALL" | tar xz -C "$tmp"
+	cp -R "$tmp"/new-file-menu-*/quick-action/"New File.workflow" "$DEST"
 fi
 
 # Register the service so it appears in the contextual menu.
