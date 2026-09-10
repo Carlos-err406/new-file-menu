@@ -26,8 +26,15 @@ agent or login item.
 
 ## quick-action/ — the working one
 
-A plain Automator Quick Action (a `.workflow` service). Right-click a folder and
-it drops an `Untitled.txt` **inside that folder**.
+A plain Automator Quick Action (a `.workflow` service). It drops an
+`Untitled.txt`:
+
+- **Right-click a folder** → inside that folder.
+- **Right-click a file** → in that file's folder (i.e. the folder you're
+  currently in). Use this to create a file in the current folder.
+
+(A completely empty folder has nothing to right-click; that empty-space case
+needs FinderSync — see below.)
 
 Install straight from GitHub (no clone needed):
 
@@ -42,7 +49,7 @@ Or from a local checkout:
 ./quick-action/uninstall.sh    # remove
 ```
 
-Then: **right-click any folder → Quick Actions › New File**.
+Then: **right-click any file or folder → Quick Actions › New File**.
 
 Notes:
 
