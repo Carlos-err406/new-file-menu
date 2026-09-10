@@ -3,12 +3,26 @@
 Add a **"New File"** action to Finder's right-click menu on macOS — the thing
 macOS inexplicably doesn't ship.
 
-Two implementations live here:
+Three implementations live here:
 
-|                                    | Where it appears                                    | Reliability                     | Signing                            |
-| ---------------------------------- | --------------------------------------------------- | ------------------------------- | ---------------------------------- |
-| **`quick-action/`** ✅ recommended | Right-click a folder → **Quick Actions › New File** | Works                           | None needed                        |
-| **`findersync/`** 🧪 experimental  | Top-level right-click item                          | Blocked on macOS 26 (see below) | Needs a real code-signing identity |
+|                                    | Where it appears                                    | Speed                     | Signing                            |
+| ---------------------------------- | --------------------------------------------------- | ------------------------- | ---------------------------------- |
+| **`quick-action/`** ✅ recommended | Right-click a folder → **Quick Actions › New File** | ~2s (Services dispatch)   | None needed                        |
+| **`service-app/`** 🐢 alternative  | **Top-level** right-click item                      | ~2s (same floor)          | None needed                        |
+| **`findersync/`** 🧪 experimental  | **Top-level**, **instant**                          | Fast (in-Finder)          | Needs a real code-signing identity |
+
+### On speed
+
+Right-clicking and picking the action feels slow (~2s) — but that time is spent
+in **Finder's third-party Services dispatch**, *before* the action's own code
+runs (measured: the handler itself does ~0 work). Both `quick-action/` (Automator)
+and `service-app/` (a resident native Services provider) hit the same ~2s floor,
+because both go through that Services pipeline. The **only** mechanism that runs
+*inside* Finder — and is therefore instant — is a **FinderSync** extension
+(`findersync/`), which is what the paid App Store apps use. That path needs real
+code signing (see below). Given equal speed, `quick-action/` is preferred over
+`service-app/` for being a plain `.workflow` with no always-running background
+agent or login item.
 
 ## quick-action/ — the working one
 
@@ -92,8 +106,11 @@ a Developer ID + notarization is needed to distribute it. Replace the `-` in
 
 ```
 quick-action/
-  New File.workflow/   the Automator service (the working tool)
+  New File.workflow/   the Automator service (the recommended tool)
   install.sh  uninstall.sh
+service-app/
+  Sources/main.swift   resident NSServices agent (top-level, but same ~2s)
+  Info.plist  build.sh  install.sh  uninstall.sh
 findersync/
   Sources/             FinderSyncExt.swift, HostMain.swift
   ext-Info.plist  host-Info.plist  ext.entitlements
