@@ -7,7 +7,7 @@
 #   curl -fsSL https://raw.githubusercontent.com/Carlos-err406/new-file-menu/main/quick-action/install.sh | bash
 set -euo pipefail
 
-RAW_BASE="https://raw.githubusercontent.com/Carlos-err406/new-file-menu/main/quick-action/New File.workflow/Contents"
+RAW_BASE="https://raw.githubusercontent.com/Carlos-err406/new-file-menu/main/quick-action/New%20File.workflow/Contents"
 DEST="$HOME/Library/Services/New File.workflow"
 
 # Find a local copy if we're running from a checkout (not via curl | bash).
