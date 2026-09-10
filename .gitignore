@@ -1,0 +1,11 @@
+# build artifacts
+findersync/build/
+
+# local signing material (never commit private keys)
+findersync/signing/
+*.p12
+*.key
+
+# logs / macOS cruft
+*.log
+.DS_Store
