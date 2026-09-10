@@ -1,5 +1,7 @@
 # build artifacts
+build/
 findersync/build/
+service-app/build/
 
 # local signing material (never commit private keys)
 findersync/signing/
