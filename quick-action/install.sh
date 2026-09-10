@@ -34,6 +34,26 @@ fi
 /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f "$DEST" 2>/dev/null || true
 /System/Library/CoreServices/pbs -flush 2>/dev/null || true
 /System/Library/CoreServices/pbs -update 2>/dev/null || true
+
+# Enable it in the Finder context menu automatically, so there's no manual
+# "System Settings -> Extensions -> Finder" toggle. This writes the same
+# enable flags that toggle would, into the pbs services database.
+KEY="(null) - New File - runWorkflowAsService"
+ENABLED_JSON='{"enabled_context_menu":1,"enabled_services_menu":1,"presentation_modes":{"ContextMenu":1,"ServicesMenu":1,"FinderPreview":1}}'
+pbs_tmp="$(mktemp)"
+if defaults export pbs "$pbs_tmp" 2>/dev/null; then
+	# ensure the container dict exists (never wipes existing entries)
+	plutil -extract NSServicesStatus xml1 -o /dev/null "$pbs_tmp" 2>/dev/null \
+		|| plutil -replace NSServicesStatus -json '{}' "$pbs_tmp" 2>/dev/null || true
+	if plutil -replace "NSServicesStatus.${KEY}" -json "$ENABLED_JSON" "$pbs_tmp" 2>/dev/null; then
+		defaults import pbs "$pbs_tmp" 2>/dev/null || true
+	fi
+fi
+rm -f "$pbs_tmp"
+/System/Library/CoreServices/pbs -flush 2>/dev/null || true
+/System/Library/CoreServices/pbs -update 2>/dev/null || true
+
 killall Finder 2>/dev/null || true
 
 echo "Done. Right-click a folder in Finder -> Quick Actions -> New File."
+echo "(If it doesn't appear, enable \"New File\" in System Settings -> Extensions -> Finder.)"
